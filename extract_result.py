@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 # -*- coding: utf-8 -*-
+# デレステのリザルト画面から、データを抜き出しjsonで返すスクリプト
 from PIL import Image
 from PIL import ImageOps
 import numpy as np
