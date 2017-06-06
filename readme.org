@@ -1,0 +1,15 @@
+#+title: Extract Deresta Result
+
+デレステのリザルト画面から、データを抽出するスクリプト
+
+* 使い方
+#+BEGIN_EXAMPLE
+python3 extract_result.py ファイル名
+#+END_EXAMPLE
+
+* やること
+- 数字の認識方法の変更に対応
+- 数字の切り出し位置を外部ファイル化
+
+* やらないこと
+- json形式以外の出力
