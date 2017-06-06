@@ -157,7 +157,7 @@ def main(fn):
         l.save("tmp/PRP{}.jpg".format(i))
 
     import json
-    print(json.dumps(data))
+    print(json.dumps(data,indent=4))
     return data
 
 if __name__=='__main__':
