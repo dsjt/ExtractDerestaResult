@@ -4,7 +4,7 @@
 
 * 使い方
 #+BEGIN_EXAMPLE
-python3 extract_result.py ファイル名
+python3 extract_result.py スクショファイル名orパス
 #+END_EXAMPLE
 
 * みりあもやるー！
