@@ -84,7 +84,7 @@ class Deresta_recognizer(object):
         if answer[1] < -500:
             img.show()
             print("[caution!] is this a new tune?")
-            img.save(datetime.now().strftime('tmp/title_%y%m%d_%H:%M:%S:%f.jpg'))
+            img.save(datetime.now().strftime('tmp_title.jpg'))
 
         info=pd.read_json(".tune_info.json")
         name = info[info['テンプレート名']==answer[0]]['楽曲名'].values[0]
@@ -116,8 +116,7 @@ class Deresta_recognizer(object):
         return bool(self.calc_score(value,temp) > -500)
 
     def extract(self,fn):
-        if (self.num_templates is None or \
-            self.title_templates is None):
+        if self.num_templates is None:
             self.load_templates()
 
         self.result = Image.open(fn)
