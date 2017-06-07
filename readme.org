@@ -8,26 +8,26 @@ python3 extract_result.py スクショファイル名orパス
 #+END_EXAMPLE
 
 * 例
-[[file:dat/test0.jpg]]
+[[file:dat/test4.jpg]]
 を引数としたときの以下を出力する。
 #+BEGIN_EXAMPLE
 {
     "title": null,
     "difficulty": null,
-    "level": 28,
+    "level": 24,
     "judge": {
-        "perfect": 796,
-        "great": 4,
+        "perfect": 538,
+        "great": 1,
         "nice": 0,
         "bad": 0,
-        "miss": 0
+        "miss": 2
     },
-    "combo": 800,
+    "combo": 358,
     "full_combo": null,
     "new_record": null,
-    "score": 654929,
-    "high_score": 733792,
-    "PRP": 728
+    "score": 610388,
+    "high_score": 0,
+    "PRP": 1003
 }
 #+END_EXAMPLE
 * みりあもやるー！
