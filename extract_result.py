@@ -6,6 +6,7 @@ from PIL import ImageOps
 import json
 import numpy as np
 import sys
+from datetime import datetime
 
 class Deresta_recognizer(object):
     def __init__(self,config_fn=".crop_box.json"):
@@ -15,7 +16,7 @@ class Deresta_recognizer(object):
         self.templates=None
         pass
 
-    def load_templates(self):
+    def load_num_templates(self):
         "テンプレートを読み込み、numpy配列として返す"
         templates = []
         for i in range(10):
@@ -50,14 +51,14 @@ class Deresta_recognizer(object):
 
     def extract(self,fn):
         if self.templates is None:
-            self.templates=load_templates()
+            self.templates=self.load_num_templates()
 
         self.result = Image.open(fn)
         # データ初期化
-        self.data = {}
+        self.data = {"date": datetime.now().strftime('%y%m%d-%H%M%S-%f')}
         for item in self.config:
-            if isinstance(self.config[item],list) \
-               and isinstance(self.config[item][0],list):
+            if isinstance(self.config[item],list) and \
+               isinstance(self.config[item][0],list):
                 images=[]
                 for i,loc in enumerate(self.config[item]):
                     im = self.result.crop(loc)
