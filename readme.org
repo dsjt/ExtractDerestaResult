@@ -8,6 +8,7 @@ python3 extract_result.py スクショファイル名orパス
 #+END_EXAMPLE
 
 * 例
+#+width: 100px
 [[file:dat/test4.jpg]]
 を引数としたときの以下を出力する。
 #+BEGIN_EXAMPLE
