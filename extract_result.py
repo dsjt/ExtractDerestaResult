@@ -3,6 +3,7 @@
 # デレステのリザルト画面から、データを抜き出しjsonで返すスクリプト
 from PIL import Image
 from PIL import ImageOps
+import json
 import numpy as np
 import sys
 
@@ -40,6 +41,12 @@ def recognize_image(img):
 # 前方一致でjpgファイルを検索しsort、数字認識し、それらを連結して返す
 def recognize_item(img_list):
     return "".join([str(recognize_image(img)) for img in img_list])
+
+def load_configuration(fn=".crop_box.json"):
+    fp=open(fn,"r")
+    config=json.load(fp)
+    fp.close()
+    return config
 
 def main(fn):
     # リザルト画像
