@@ -25,11 +25,11 @@ class Deresta_recognizer(object):
             templates+=[temp]
         return templates
 
-    def calc_score(self,x,y):
+    def calc_score(self,x,temp):
         "ベクトルx、yを比較し、スコアを計算し返す。現状では負の二乗誤差"
         regularized_x = (x-np.min(x))/(np.max(x)-np.min(x))
-        regularized_y = (y-np.min(y))/(np.max(y)-np.min(y))
-        return -np.sum((regularized_y-regularized_x)**2)
+        regularized_temp = (temp-np.min(temp))/(np.max(temp)-np.min(temp))
+        return -np.sum((regularized_temp-regularized_x)**2)
 
     def classify_number(self,img):
         """
@@ -41,11 +41,15 @@ class Deresta_recognizer(object):
         """
         gray = ImageOps.grayscale(img)
         value = np.array(gray.resize(self.regularized_size))
-        score = [self.calc_score(temp,value) for temp in self.templates]
-        answer = np.argmax(score)
+        if np.std(value) < 10: # 数字らしきものが見えん場合
+            answer = 0
+            gray.show()
+        else:
+            score = [self.calc_score(value,temp) for temp in self.templates]
+            answer = np.argmax(score)
         return answer
 
-    def recognize(self,image_list):
+    def recognize_num(self,image_list):
         "画像リストの数字を認識し、ひとつづきの整数と解釈して返す"
         return int("".join([str(self.classify_number(img)) for img in image_list]))
 
@@ -64,7 +68,7 @@ class Deresta_recognizer(object):
                     im = self.result.crop(loc)
                     im.save("tmp/{}{}.jpg".format(item,i))
                     images+=[im]
-                self.data[item]=self.recognize(images)
+                self.data[item]=self.recognize_num(images)
             elif isinstance(self.config[item],list):
                 im = self.result.crop(self.config[item])
                 im.save("tmp/{}.jpg".format(item))
