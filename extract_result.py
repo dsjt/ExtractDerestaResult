@@ -100,13 +100,12 @@ class Deresta_recognizer(object):
             templates+=[[os.path.basename(fn), temp]]
         # 対象画像の読み込み
         value = np.array(img)
-        import pdb; pdb.set_trace()
         scores = [[item[0],self.calc_score(value,item[1])] for item in templates]
         answer=max(scores,key=lambda x:x[1])[0].split(".")[0].upper()
         return answer
 
     def recognize_full_combo(self,img):
-        with Image.Open("./dat/full_combo.jpg") as im:
+        with Image.open("./dat/full_combo.jpg") as im:
             temp = np.array(im)
         # 対象画像の読み込み
         value = np.array(img)
@@ -122,7 +121,7 @@ class Deresta_recognizer(object):
 
         self.result = Image.open(fn)
         # データ初期化
-        self.data = {"date": datetime.now().strftime('%y%m%d-%H%M%S-%f')}
+        self.data = {"date": datetime.now().strftime('%y/%m/%d %H:%M:%S:%f')}
         info = None
         for item in self.config:
             if item == 'title':
