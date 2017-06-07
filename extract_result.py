@@ -73,14 +73,18 @@ class Deresta_recognizer(object):
             im = Image.open(fn)
             temp = np.asarray(im)
             templates+=[[os.path.basename(fn), temp]]
-        templates = dict(sorted(templates,key=lambda x: x[1]))
+        templates = dict(sorted(templates,key=lambda x: x[0]))
 
         # 対象画像の読み込み
         value = np.array(img)
 
         scores = [[key,self.calc_score(value,templates[key])] for key in templates]
-        # 最大値が小さすぎるようなら、識別不能の新データと解釈して保存しておきたい
         answer=max(scores,key=lambda x:x[1])
+        import pdb; pdb.set_trace()
+        # しっくり来てないようなら保存
+        if answer[1] < -500:
+            print("[caution!] is this a new tune?")
+            img.save(datetime.now().strftime('tmp/title_%y%m%d_%H:%M:%S:%f.jpg'))
 
         info=pd.read_json(".tune_info.json")
         name = info[info['テンプレート名']==answer[0]]['楽曲名'].values[0]
@@ -126,10 +130,12 @@ class Deresta_recognizer(object):
         for item in self.config:
             if item == 'title':
                 img = self.result.crop(self.config[item])
+                img.save(datetime.now().strftime('tmp/title.jpg'))
                 info = self.recognize_title(img)
                 self.data[item]=info['楽曲名'].values[0]
             elif item == 'difficulty':
                 img = self.result.crop(self.config[item])
+                img.save(datetime.now().strftime('tmp/difficulty.jpg'))
                 difficulty=self.recognize_difficulty(img)
                 self.data[item]=difficulty
             elif item == 'full_combo':
