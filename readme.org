@@ -11,7 +11,7 @@ python3 extract_result.py スクショファイル名orパス
 #+attr_html: :width "100px"
 #+ATTR_ORG: :width 100
 [[file:dat/test4.jpg]]
-を引数としたときの以下を出力する。
+の画像を与えた時、以下を出力する。
 #+BEGIN_EXAMPLE
 {
     "date": "17/06/07 17:57:35:062447",
