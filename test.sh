@@ -3,5 +3,6 @@ files=`ls dat/test*.jpg`
 for f in $files
 do
     ./extract_result.py $f
+    break
 done
-open $files
+# open $files

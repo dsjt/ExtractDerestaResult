@@ -93,13 +93,16 @@ class Deresta_recognizer(object):
                    "./dat/pro.jpg",
                    "./dat/master.jpg",
                    "./dat/master+.jpg"]:
+            if not os.path.exists(fn):
+                continue
             im = Image.open(fn)
             temp = np.asarray(im)
-            templates+=[[fn, temp]]
+            templates+=[[os.path.basename(fn), temp]]
         # 対象画像の読み込み
         value = np.array(img)
-        scores = [[key,self.calc_score(value,templates[key])] for key in templates]
-        answer=max(scores,key=lambda x:x[1])
+        import pdb; pdb.set_trace()
+        scores = [[item[0],self.calc_score(value,item[1])] for item in templates]
+        answer=max(scores,key=lambda x:x[1])[0].split(".")[0].upper()
         return answer
 
     def extract(self,fn):
@@ -119,6 +122,11 @@ class Deresta_recognizer(object):
             elif item == 'difficulty':
                 img = self.result.crop(self.config[item])
                 difficulty=self.recognize_difficulty(img)
+                self.data[item]=difficulty
+            elif item == 'full_combo':
+                img = self.result.crop(self.config[item])
+                difficulty=self.recognize_difficulty(img)
+                self.data[item]=difficulty
             elif isinstance(self.config[item],list) and \
                isinstance(self.config[item][0],list):
                 images=[]
