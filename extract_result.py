@@ -72,7 +72,7 @@ class Deresta_recognizer(object):
         for fn in glob("./dat/tunes/*.jpg"):
             im = Image.open(fn)
             temp = np.asarray(im)
-            templates+=[[fn, temp]]
+            templates+=[[os.path.basename(fn), temp]]
         templates = dict(sorted(templates,key=lambda x: x[1]))
 
         # 対象画像の読み込み
@@ -83,9 +83,24 @@ class Deresta_recognizer(object):
         answer=max(scores,key=lambda x:x[1])
 
         info=pd.read_json(".tune_info.json")
-        bn = os.path.basename(answer[0])
-        name = info[info['テンプレート名']==bn]['楽曲名'].values[0]
+        name = info[info['テンプレート名']==answer[0]]['楽曲名'].values[0]
         return info[info['楽曲名']==name]
+
+    def recognize_difficulty(self,img):
+        templates = []
+        for fn in ["./dat/debut.jpg",
+                   "./dat/regular.jpg",
+                   "./dat/pro.jpg",
+                   "./dat/master.jpg",
+                   "./dat/master+.jpg"]:
+            im = Image.open(fn)
+            temp = np.asarray(im)
+            templates+=[[fn, temp]]
+        # 対象画像の読み込み
+        value = np.array(img)
+        scores = [[key,self.calc_score(value,templates[key])] for key in templates]
+        answer=max(scores,key=lambda x:x[1])
+        return answer
 
     def extract(self,fn):
         if (self.num_templates is None or \
@@ -101,6 +116,9 @@ class Deresta_recognizer(object):
                 img = self.result.crop(self.config[item])
                 info = self.recognize_title(img)
                 self.data[item]=info['楽曲名'].values[0]
+            elif item == 'difficulty':
+                img = self.result.crop(self.config[item])
+                difficulty=self.recognize_difficulty(img)
             elif isinstance(self.config[item],list) and \
                isinstance(self.config[item][0],list):
                 images=[]
