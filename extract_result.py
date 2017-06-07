@@ -68,17 +68,6 @@ class Deresta_recognizer(object):
                 im = self.result.crop(self.config[item])
                 im.save("tmp/{}.jpg".format(item))
                 self.data[item]=None
-            elif isinstance(self.config[item],dict):
-                # dictの中に単一四角形は許していない
-                inner_data={}
-                for jtem in self.config[item]:
-                    images=[]
-                    for i,loc in enumerate(self.config[item][jtem]):
-                        im = self.result.crop(loc)
-                        im.save("tmp/{}{}.jpg".format(item,i))
-                        images+=[im]
-                    inner_data[jtem]=self.recognize(images)
-                self.data[item]=inner_data
             else:
                 print("?",item)
                 pass
