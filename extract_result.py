@@ -105,6 +105,16 @@ class Deresta_recognizer(object):
         answer=max(scores,key=lambda x:x[1])[0].split(".")[0].upper()
         return answer
 
+    def recognize_full_combo(self,img):
+        with Image.Open("./dat/full_combo.jpg") as im:
+            temp = np.array(im)
+        # 対象画像の読み込み
+        value = np.array(img)
+        if self.calc_score(value,temp) < -10000:
+            return True
+        else:
+            return False
+
     def extract(self,fn):
         if (self.num_templates is None or \
             self.title_templates is None):
@@ -125,8 +135,7 @@ class Deresta_recognizer(object):
                 self.data[item]=difficulty
             elif item == 'full_combo':
                 img = self.result.crop(self.config[item])
-                difficulty=self.recognize_difficulty(img)
-                self.data[item]=difficulty
+                self.data[item]=self.recognize_full_combo(img)
             elif isinstance(self.config[item],list) and \
                isinstance(self.config[item][0],list):
                 images=[]
