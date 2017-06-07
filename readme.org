@@ -2,7 +2,7 @@
 
 デレステのリザルト画面から、データを抽出するスクリプト
 
-* 使い方
+* みりあもやるー！
 #+BEGIN_EXAMPLE
 python3 extract_result.py スクショファイル名orパス
 #+END_EXAMPLE
