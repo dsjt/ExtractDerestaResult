@@ -11,24 +11,25 @@ python3 extract_result.py スクショファイル名orパス
 #+attr_html: :width "100px"
 #+ATTR_ORG: :width 100
 [[file:dat/test4.jpg]]
+[[file:dat/test4.jpg]]
 を引数としたときの以下を出力する。
 #+BEGIN_EXAMPLE
 {
-    "title": null,
-    "difficulty": null,
+    "date": "17/06/07 17:57:35:062447",
+    "title": "Treasure☆",
+    "difficulty": "MASTER",
     "level": 24,
-    "judge": {
-        "perfect": 538,
-        "great": 1,
-        "nice": 0,
-        "bad": 0,
-        "miss": 2
-    },
+    "perfect": 538,
+    "great": 1,
+    "nice": 0,
+    "bad": 0,
+    "miss": 2,
     "combo": 358,
-    "full_combo": null,
-    "new_record": null,
+    "full_combo": true,
+    "new_record": true,
     "score": 610388,
     "high_score": 0,
+    "tune_PRP": 0,
     "PRP": 1003
 }
 #+END_EXAMPLE
@@ -37,10 +38,12 @@ python3 extract_result.py スクショファイル名orパス
 - 数字の認識方法いくつか試す
 - +数字の切り出し位置を外部ファイル化+
 - 出力を取りまとめるシェルスクリプト
-- 曲名の認識
+- +曲名の認識+
+- 曲名の教師データの収集
 - +楽曲PRPの認識+
-- フルコンボ、ニューレコードの認識
-- 難易度の認識
+- +フルコンボ、ニューレコードの認識+
+- +難易度の認識+
+- 難易度の教師データの収集
 
 * みりあやんないよ
 - json形式以外の出力

@@ -80,9 +80,9 @@ class Deresta_recognizer(object):
 
         scores = [[key,self.calc_score(value,templates[key])] for key in templates]
         answer=max(scores,key=lambda x:x[1])
-        import pdb; pdb.set_trace()
         # しっくり来てないようなら保存
         if answer[1] < -500:
+            img.show()
             print("[caution!] is this a new tune?")
             img.save(datetime.now().strftime('tmp/title_%y%m%d_%H:%M:%S:%f.jpg'))
 
@@ -108,15 +108,12 @@ class Deresta_recognizer(object):
         answer=max(scores,key=lambda x:x[1])[0].split(".")[0].upper()
         return answer
 
-    def recognize_full_combo(self,img):
-        with Image.open("./dat/full_combo.jpg") as im:
+    def recognize_exists(self,img,template_fn):
+        with Image.open(template_fn) as im:
             temp = np.array(im)
         # 対象画像の読み込み
         value = np.array(img)
-        if self.calc_score(value,temp) < -10000:
-            return True
-        else:
-            return False
+        return bool(self.calc_score(value,temp) > -500)
 
     def extract(self,fn):
         if (self.num_templates is None or \
@@ -140,7 +137,12 @@ class Deresta_recognizer(object):
                 self.data[item]=difficulty
             elif item == 'full_combo':
                 img = self.result.crop(self.config[item])
-                self.data[item]=self.recognize_full_combo(img)
+                img.save("tmp/{}.jpg".format(item))
+                self.data[item]=self.recognize_exists(img,"./dat/full_combo.jpg")
+            elif item == 'new_record':
+                img = self.result.crop(self.config[item])
+                img.save("tmp/{}.jpg".format(item))
+                self.data[item]=self.recognize_exists(img,"./dat/new_record.jpg")
             elif isinstance(self.config[item],list) and \
                isinstance(self.config[item][0],list):
                 images=[]
@@ -163,7 +165,7 @@ def main(fn):
     # 設定読み込み
     dr = Deresta_recognizer()
     data = dr.extract(fn)
-    print(json.dumps(data,indent=4))
+    print(json.dumps(data,indent=4,ensure_ascii=False))
     return data
 
 if __name__=='__main__':
