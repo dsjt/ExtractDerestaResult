@@ -6,6 +6,8 @@ from PIL import ImageOps
 import json
 import numpy as np
 import sys
+import os
+import pandas as pd
 from datetime import datetime
 
 class Deresta_recognizer(object):
@@ -13,17 +15,26 @@ class Deresta_recognizer(object):
         with open(config_fn,"r") as f:
             self.config=json.load(f)
         self.regularized_size=(18,26)
-        self.templates=None
+        self.num_templates=None
+        self.title_templates=None
+        self.difficulty_templates=None
         pass
 
     def load_num_templates(self):
-        "テンプレートを読み込み、numpy配列として返す"
+        "数字のテンプレートを読み込み、numpy配列として返す"
         templates = []
         for i in range(10):
             im = Image.open("dat/"+str(i)+".jpg").resize(self.regularized_size)
             temp = np.asarray(im)
             templates+=[temp]
+        self.num_templates=templates
         return templates
+
+
+    def load_templates(self):
+        # self.load_title_tamplates()
+        # self.load_difficulty_tamplates()
+        self.load_num_templates()
 
     def calc_score(self,x,temp):
         "ベクトルx、yを比較し、スコアを計算し返す。現状では負の二乗誤差"
@@ -43,9 +54,8 @@ class Deresta_recognizer(object):
         value = np.array(gray.resize(self.regularized_size))
         if np.std(value) < 10: # 数字らしきものが見えん場合
             answer = 0
-            gray.show()
         else:
-            score = [self.calc_score(value,temp) for temp in self.templates]
+            score = [self.calc_score(value,temp) for temp in self.num_templates]
             answer = np.argmax(score)
         return answer
 
@@ -53,15 +63,45 @@ class Deresta_recognizer(object):
         "画像リストの数字を認識し、ひとつづきの整数と解釈して返す"
         return int("".join([str(self.classify_number(img)) for img in image_list]))
 
+    def recognize_title(self,img):
+        "画像を認識し、曲情報の表を返す"
+        from glob import glob
+
+        # テンプレートの読み込み
+        templates = []
+        for fn in glob("./dat/tunes/*.jpg"):
+            im = Image.open(fn)
+            temp = np.asarray(im)
+            templates+=[[fn, temp]]
+        templates = dict(sorted(templates,key=lambda x: x[1]))
+
+        # 対象画像の読み込み
+        value = np.array(img)
+
+        scores = [[key,self.calc_score(value,templates[key])] for key in templates]
+        # 最大値が小さすぎるようなら、識別不能の新データと解釈して保存しておきたい
+        answer=max(scores,key=lambda x:x[1])
+
+        info=pd.read_json(".tune_info.json")
+        bn = os.path.basename(answer[0])
+        name = info[info['テンプレート名']==bn]['楽曲名'].values[0]
+        return info[info['楽曲名']==name]
+
     def extract(self,fn):
-        if self.templates is None:
-            self.templates=self.load_num_templates()
+        if (self.num_templates is None or \
+            self.title_templates is None):
+            self.load_templates()
 
         self.result = Image.open(fn)
         # データ初期化
         self.data = {"date": datetime.now().strftime('%y%m%d-%H%M%S-%f')}
+        info = None
         for item in self.config:
-            if isinstance(self.config[item],list) and \
+            if item == 'title':
+                img = self.result.crop(self.config[item])
+                info = self.recognize_title(img)
+                self.data[item]=info['楽曲名'].values[0]
+            elif isinstance(self.config[item],list) and \
                isinstance(self.config[item][0],list):
                 images=[]
                 for i,loc in enumerate(self.config[item]):
