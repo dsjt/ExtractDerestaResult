@@ -25,8 +25,8 @@ def load_num_image(fn):
     im = Image.open(fn).resize(regularized_number_image_size)
     value = np.asarray(im)
     # 中央値で二値化
-    threshold_value = np.asarray(im<np.mean(value),dtype=int) # 黒が0になることに注意な
-    return threshold_value,im
+    bi_value = np.asarray(im<np.mean(value),dtype=int) # 黒が0になることに注意な
+    return bi_value,im
 
 # 画像から数字を認識して返す
 def recognize_image(img):
