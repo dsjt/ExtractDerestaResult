@@ -7,84 +7,88 @@ import json
 import numpy as np
 import sys
 
-regularized_number_image_size=(18,26)
+class Deresta_recognizer(object):
+    def __init__(self,config_fn=".crop_box.json"):
+        with open(config_fn,"r") as f:
+            self.config=json.load(f)
+        self.regularized_size=(18,26)
+        self.templates=None
+        pass
 
-# テンプレートの読み込み、二値化したnumpy配列のリストと、画像のリストを返す
-def load_templates():
-    templates = []
-    images = []
-    for i in range(10):
-        im = Image.open("dat/"+str(i)+".jpg").resize(regularized_number_image_size)
-        images += [im]
-        value = np.asarray(im)
-        templates += [np.asarray(value<np.mean(value),dtype=int)]
-    return templates,images
+    def load_templates(self):
+        "テンプレートを読み込み、numpy配列として返す"
+        templates = []
+        for i in range(10):
+            im = Image.open("dat/"+str(i)+".jpg").resize(self.regularized_size)
+            temp = np.asarray(im)
+            templates+=[temp]
+        return templates
 
-# 画像を読み込み、二値化したnumpy配列と画像を返す
-def load_num_image(fn):
-    im = Image.open(fn).resize(regularized_number_image_size)
-    value = np.asarray(im)
-    # 中央値で二値化
-    bi_value = np.asarray(im<np.mean(value),dtype=int) # 黒が0になることに注意な
-    return bi_value,im
+    def calc_score(self,x,y):
+        "ベクトルx、yを比較し、スコアを計算し返す。現状では負の二乗誤差"
+        regularized_x = (x-np.min(x))/(np.max(x)-np.min(x))
+        regularized_y = (y-np.min(y))/(np.max(y)-np.min(y))
+        return -np.sum((regularized_y-regularized_x)**2)
 
-# 画像から数字を認識して返す
-def recognize_image(img):
-    import sys
-    templates,images = load_templates()
-    gray=ImageOps.grayscale(img)
-    value = np.array(gray.resize(regularized_number_image_size))
-    bi_value = np.asarray(value < np.mean(value),dtype=int)
-    score = [np.sum(np.logical_not(np.logical_xor(t,bi_value))) for t in templates]
-    answer = np.argmax(score)
-    return answer
+    def classify_number(self,img):
+        """
+        画像がどの数字であるかを識別して返す。
+        arg:
+          img: 画像
+        return(int)
+          識別された数字
+        """
+        gray = ImageOps.grayscale(img)
+        value = np.array(gray.resize(self.regularized_size))
+        score = [self.calc_score(temp,value) for temp in self.templates]
+        answer = np.argmax(score)
+        return answer
 
-# 前方一致でjpgファイルを検索しsort、数字認識し、それらを連結して返す
-def recognize_item(img_list):
-    return "".join([str(recognize_image(img)) for img in img_list])
+    def recognize(self,image_list):
+        "画像リストの数字を認識し、ひとつづきの整数と解釈して返す"
+        return int("".join([str(self.classify_number(img)) for img in image_list]))
 
-def load_configuration(fn=".crop_box.json"):
-    fp=open(fn,"r")
-    config=json.load(fp)
-    fp.close()
-    return config
+    def extract(self,fn):
+        if self.templates is None:
+            self.templates=load_templates()
+
+        self.result = Image.open(fn)
+        # データ初期化
+        self.data = {}
+        for item in self.config:
+            if isinstance(self.config[item],list) \
+               and isinstance(self.config[item][0],list):
+                images=[]
+                for i,loc in enumerate(self.config[item]):
+                    im = self.result.crop(loc)
+                    im.save("tmp/{}{}.jpg".format(item,i))
+                    images+=[im]
+                self.data[item]=self.recognize(images)
+            elif isinstance(self.config[item],list):
+                im = self.result.crop(self.config[item])
+                im.save("tmp/{}.jpg".format(item))
+                self.data[item]=None
+            elif isinstance(self.config[item],dict):
+                # dictの中に単一四角形は許していない
+                inner_data={}
+                for jtem in self.config[item]:
+                    images=[]
+                    for i,loc in enumerate(self.config[item][jtem]):
+                        im = self.result.crop(loc)
+                        im.save("tmp/{}{}.jpg".format(item,i))
+                        images+=[im]
+                    inner_data[jtem]=self.recognize(images)
+                self.data[item]=inner_data
+            else:
+                print("?",item)
+                pass
+        return self.data
+
 
 def main(fn):
     # 設定読み込み
-    config = load_configuration()
-
-    # リザルト画像
-    result = Image.open(fn)
-
-    # データ初期化
-    data = {}
-    for item in config:
-        if isinstance(config[item],list) and isinstance(config[item][0],list):
-            images=[]
-            for i,loc in enumerate(config[item]):
-                im = result.crop(loc)
-                im.save("tmp/{}{}.jpg".format(item,i))
-                images+=[im]
-            data[item]=int(recognize_item(images))
-        elif isinstance(config[item],list):
-            im = result.crop(config[item])
-            im.save("tmp/{}.jpg".format(item))
-            data[item]=None
-        elif isinstance(config[item],dict):
-            # dictの中に単一四角形は許していない
-            inner_data={}
-            for jtem in config[item]:
-                images=[]
-                for i,loc in enumerate(config[item][jtem]):
-                    im = result.crop(loc)
-                    im.save("tmp/{}{}.jpg".format(item,i))
-                    images+=[im]
-                inner_data[jtem]=int(recognize_item(images))
-            data[item]=inner_data
-        else:
-            print("?",item)
-            pass
-
+    dr = Deresta_recognizer()
+    data = dr.extract(fn)
     print(json.dumps(data,indent=4))
     return data
 
