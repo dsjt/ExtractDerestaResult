@@ -33,6 +33,7 @@ class Deresta_recognizer(object):
         return templates
 
     def load_title_templates(self):
+        from glob import glob
         templates = []
         for fn in glob("./dat/tunes/*.jpg"):
             im = Image.open(fn)
