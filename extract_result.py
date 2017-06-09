@@ -89,8 +89,8 @@ class Deresta_recognizer(object):
           識別された数字
         """
         gray = ImageOps.grayscale(img)
-        value = np.array(gray.resize(self.regularized_size))
-        if np.std(value) < 10:  # 数字らしきものが見えん場合
+        value = np.array( gray.resize(self.regularized_size))
+        if np.std(value) < 20:  # 数字らしきものが見えん場合
             answer = 0
         else:
             score = [self.calc_score(value, temp)
