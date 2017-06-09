@@ -10,7 +10,7 @@ python3 extract_result.py スクショファイル名orパス
 * 例
 #+attr_html: :width "100px"
 #+ATTR_ORG: :width 100
-[[file:dat/test4.jpg]]
+[[file:test/test04.jpg]]
 の画像を与えた時、以下を出力する。
 #+BEGIN_EXAMPLE
 {
