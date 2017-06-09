@@ -58,10 +58,17 @@ class Deresta_recognizer(object):
             tune_info = info[info['楽曲名'].str.contains(tune_name)][:1]
             print(tune_info)
             print("該当する楽曲が見つかりました。")
-            temp_name = tune_info['テンプレート名'].values[0]
-            img.save("dat/tunes/" + temp_name)
-            print("{}として保存しました。".format(temp_name))
-            print("再実行してください。")
+            temp_path = "dat/tunes/"+tune_info['テンプレート名'].values[0]
+            if os.path.exists(temp_path):
+                print(temp_path+"はすでに存在しています。")
+                print("予期しない動作です。閾値のチューニングが必要です。")
+                img.show()
+                import subprocess
+                subprocess.run(["open",temp_path])
+            else:
+                img.save(temp_path)
+                print("{}として保存しました。".format(temp_name))
+                print("再実行してください。")
 
     def calc_score(self, x, temp):
         "ベクトルx、yを比較し、スコアを計算し返す。現状では負の二乗誤差"
