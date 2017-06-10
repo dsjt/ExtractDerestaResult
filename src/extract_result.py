@@ -35,7 +35,7 @@ class Deresta_recognizer(object):
     def load_title_templates(self):
         from glob import glob
         templates = []
-        for fn in glob("./dat/tunes/*.jpg"):
+        for fn in glob("./dat/title/*.jpg"):
             im = Image.open(fn)
             temp = np.asarray(im)
             templates += [[os.path.basename(fn), temp]]
@@ -59,7 +59,7 @@ class Deresta_recognizer(object):
             tune_info = info[info['楽曲名'].str.contains(tune_name)][:1]
             print(tune_info)
             print("該当する楽曲が見つかりました。")
-            temp_path = "dat/tunes/"+tune_info['テンプレート名'].values[0]
+            temp_path = "dat/title/"+tune_info['テンプレート名'].values[0]
             if os.path.exists(temp_path):
                 print(temp_path+"はすでに存在しています。")
                 print("予期しない動作です。閾値のチューニングが必要です。")
@@ -68,7 +68,7 @@ class Deresta_recognizer(object):
                 subprocess.run(["open",temp_path])
             else:
                 img.save(temp_path)
-                print("{}として保存しました。".format(temp_name))
+                print("{}として保存しました。".format(temp_path))
                 print("再実行してください。")
 
     def calc_score(self, x, temp):
@@ -123,8 +123,13 @@ class Deresta_recognizer(object):
         if self.too_small_score(answer[1]):
             self.add_new_tune_UI(img, info)
 
-        name = info[info['テンプレート名'] == answer[0]]['楽曲名'].values[0]
-        return info[info['楽曲名'] == name]
+        index = info['テンプレート名'] == answer[0]
+        if not any(index):
+            print("タイトルテンプレートとtune_infoが一致しません")
+            return None
+        else:
+            name = info[info['テンプレート名'] == answer[0]]['楽曲名'].values[0]
+            return info[info['楽曲名'] == name]
 
     def recognize_difficulty(self, img):
         templates = []

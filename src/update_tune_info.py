@@ -3,6 +3,7 @@ import itertools
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pandas as pd
+import json
 
 def conv_table2list(table):
     "BeautifulSoupのtableから内容を取得してリストで返す"
@@ -39,3 +40,4 @@ template_df=pd.DataFrame(images,columns=["テンプレート名"])
 # 結合、出力
 df = pd.concat([tune_df,template_df],axis=1)
 df.to_json(".tune_info.json",force_ascii=False)
+# json.dumps(df.to_dict(),indent=4)
