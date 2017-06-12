@@ -4,6 +4,7 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pandas as pd
 import json
+import unicodedata
 
 
 class html_table_parser(object):
@@ -61,6 +62,7 @@ def tune_info_test():
     url = "https://imascg-slstage-wiki.gamerch.com/%E6%A5%BD%E6%9B%B2%E8%A9%B3%E7%B4%B0%E4%B8%80%E8%A6%A7"
     dfs = ti.get_df_from(url)
     templates = dfs['楽曲名'].str.cat(["jpg"] * len(dfs), sep=".")
+    templates = templates.map(lambda x: unicodedata.normalize('NFKC', x))
     templates.name = "テンプレート名"
     ti.data = pd.concat([dfs, templates], axis=1)
     ti.save_info()

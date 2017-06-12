@@ -9,6 +9,9 @@ import sys
 import os
 import pandas as pd
 from datetime import datetime
+from update_tune_info import tune_info
+import unicodedata
+
 
 class Deresta_recognizer(object):
 
@@ -42,10 +45,6 @@ class Deresta_recognizer(object):
         templates = dict(sorted(templates, key=lambda x: x[0]))
         return templates
 
-    def load_info(self, fn='.tune_info.json'):
-        info = pd.read_json(fn)
-        return info
-
     def add_new_tune_UI(self, img, info):
         img.show()
         print("一致率が低いです。新規譜面ではありませんか？")
@@ -53,19 +52,20 @@ class Deresta_recognizer(object):
         if info[info['楽曲名'].str.contains(tune_name)] is None:
             print("曲名を検索しましたが、ありませんでした。" +
                   "tmp_title.jpgとして保存します" +
-                  "新しく実装された曲の場合、update_tune_info.pyの実行を検討して下さい。")
+                  "新しく実装された曲の場合、" +
+                  "update_tune_info.pyの実行を検討して下さい。")
             img.save("tmp_title.jpg")
         else:
-            tune_info = info[info['楽曲名'].str.contains(tune_name)][:1]
-            print(tune_info)
-            print("該当する楽曲が見つかりました。")
-            temp_path = "dat/title/"+tune_info['テンプレート名'].values[0]
+            tune_info = info[info['楽曲名'].str.contains(tune_name)]
+            print(tune_info['楽曲名'])
+            print("楽曲情報と一致しました。")
+            temp_path = "dat/title/" + tune_info[:1]['テンプレート名'].values[0]
             if os.path.exists(temp_path):
-                print(temp_path+"はすでに存在しています。")
+                print(temp_path + "はすでに存在しています。")
                 print("予期しない動作です。閾値のチューニングが必要です。")
                 img.show()
                 import subprocess
-                subprocess.run(["open",temp_path])
+                subprocess.run(["open", temp_path])
             else:
                 img.save(temp_path)
                 print("{}として保存しました。".format(temp_path))
@@ -90,7 +90,7 @@ class Deresta_recognizer(object):
           識別された数字
         """
         gray = ImageOps.grayscale(img)
-        value = np.array( gray.resize(self.regularized_size))
+        value = np.array(gray.resize(self.regularized_size))
         if np.std(value) < 20:  # 数字らしきものが見えん場合
             answer = 0
         else:
@@ -111,19 +111,21 @@ class Deresta_recognizer(object):
         templates = self.load_title_templates()
 
         # 楽曲情報の取得
-        info = self.load_info()
+        info = tune_info(".tune_info.csv").load_info()
 
         # 一致率計算
         value = np.array(img)
         scores = [[key, self.calc_score(value, templates[key])]
                   for key in templates]
         answer = max(scores, key=lambda x: x[1])
+        answer[0] = unicodedata.normalize('NFKC', answer[0])
 
         # 一致率が低する場合、テンプレート情報として追加する
         if self.too_small_score(answer[1]):
             self.add_new_tune_UI(img, info)
+            return -1
 
-        index = info['テンプレート名'] == answer[0]
+        index = (info['テンプレート名'] == answer[0])
         if not any(index):
             print("タイトルテンプレートとtune_infoが一致しません")
             return None
@@ -208,6 +210,8 @@ def main(fn):
     # 設定読み込み
     dr = Deresta_recognizer()
     data = dr.extract(fn)
+    if data == -1:
+        return -1
     print(json.dumps(data, indent=4, ensure_ascii=False))
     return data
 
