@@ -163,7 +163,7 @@ class Deresta_recognizer(object):
         if self.num_templates is None:
             self.load_num_templates()
 
-        self.result = Image.open(fn)
+        self.result = Image.open(fn).resize((1136, 640))
         # データ初期化
         self.data = {"date": datetime.now().strftime('%y/%m/%d %H:%M:%S:%f')}
         info = None
