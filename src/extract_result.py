@@ -165,7 +165,8 @@ class Deresta_recognizer(object):
 
         self.result = Image.open(fn).resize((1136, 640))
         # データ初期化
-        self.data = {"date": datetime.now().strftime('%y/%m/%d %H:%M:%S:%f')}
+        self.data = {"date": datetime.now().strftime('%y/%m/%d %H:%M:%S:%f'),
+                     "filename": fn}
         info = None
         for item in self.config:
             if item == 'title':
