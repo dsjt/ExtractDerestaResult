@@ -36,7 +36,7 @@ python3 extract_result.py スクショファイル名orパス
 - 数字の認識方法いくつか試して遊ぶ
 - 出力を取りまとめるシェルスクリプト
 - +曲名の教師データの収集+
-- 難易度の教師データの収集(DEBUT,REGULAR,PRO,MASTER+)
+- +難易度の教師データの収集(DEBUT,REGULAR,PRO,MASTER+)+
 - 光の反射で認識が阻害される問題への対処
 
 * みりあやんないよ
