@@ -168,12 +168,17 @@ class Deresta_recognizer(object):
         answer = max(scores, key=lambda x: x[1])[0].split(".")[0].upper()
         return answer
 
-    def recognize_exists(self, img, template_fn):
-        with Image.open(template_fn) as im:
-            temp = np.array(im)
+    def recognize_exists(self, img, exist_fn, notex_fn):
+        with Image.open(exist_fn) as im:
+            exist_val = np.array(im)
+        with Image.open(notex_fn) as im:
+            notex_val = np.array(im)
         # 対象画像の読み込み
         value = np.array(img)
-        return bool(self.calc_score(value, temp) > -200)
+
+        exist_score = self.calc_score(value, exist_val)
+        notex_score = self.calc_score(value, notex_val)
+        return bool(exist_score > notex_score)
 
     def extract(self, fn):
         if self.num_templates is None:
@@ -199,12 +204,12 @@ class Deresta_recognizer(object):
                 img = self.result.crop(self.config[item])
                 img.save("tmp/{}.jpg".format(item))
                 self.data[item] = self.recognize_exists(
-                    img, "./dat/full_combo.jpg")
+                    img, "./dat/full_combo.jpg", "./dat/not_full_combo.jpg")
             elif item == 'new_record':
                 img = self.result.crop(self.config[item])
                 img.save("tmp/{}.jpg".format(item))
                 self.data[item] = self.recognize_exists(
-                    img, "./dat/new_record.jpg")
+                    img, "./dat/new_record.jpg", "./dat/not_new_record.jpg")
             elif isinstance(self.config[item], list) and \
                     isinstance(self.config[item][0], list):
                 images = []
