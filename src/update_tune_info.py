@@ -57,7 +57,7 @@ class tune_info(html_table_parser):
         return self.data
 
 
-def tune_info_test():
+def main():
     ti = tune_info(".tune_info.csv")
     url = "https://imascg-slstage-wiki.gamerch.com/%E6%A5%BD%E6%9B%B2%E8%A9%B3%E7%B4%B0%E4%B8%80%E8%A6%A7"
     dfs = ti.get_df_from(url)
@@ -66,3 +66,6 @@ def tune_info_test():
     templates.name = "テンプレート名"
     ti.data = pd.concat([dfs, templates], axis=1)
     ti.save_info()
+
+if __name__ == "__main__":
+    main()
