@@ -13,6 +13,15 @@ from update_tune_info import tune_info
 import unicodedata
 
 
+def yes_or_no(question):
+    while True:
+        choice = input(question).lower()
+        if choice in ['y', 'ye', 'yes']:
+            return True
+        elif choice in ['n', 'no']:
+            return False
+
+
 class Deresta_recognizer(object):
 
     def __init__(self, config_fn=".crop_box.json"):
@@ -49,27 +58,34 @@ class Deresta_recognizer(object):
         img.show()
         print("一致率が低いです。新規譜面ではありませんか？")
         tune_name = input("画像の曲のタイトルの一部を入力")
-        if info[info['楽曲名'].str.contains(tune_name)] is None:
+        if len(info[info['楽曲名'].str.contains(tune_name)]) == 0:
             print("曲名を検索しましたが、ありませんでした。" +
                   "tmp_title.jpgとして保存します" +
                   "新しく実装された曲の場合、" +
                   "update_tune_info.pyの実行を検討して下さい。")
             img.save("tmp_title.jpg")
+            raise("エラー1092")
         else:
             tune_info = info[info['楽曲名'].str.contains(tune_name)]
             print(tune_info['楽曲名'])
             print("楽曲情報と一致しました。")
             temp_path = "dat/title/" + tune_info[:1]['テンプレート名'].values[0]
-            if os.path.exists(temp_path):
-                print(temp_path + "はすでに存在しています。")
-                print("予期しない動作です。閾値のチューニングが必要です。")
-                img.show()
-                import subprocess
-                subprocess.run(["open", temp_path])
+            yesorno = yes_or_no("{}として追加しますか？(y/n)".format(temp_path))
+            if yesorno == True:
+                if os.path.exists(temp_path):
+                    print(temp_path + "はすでに存在しています。")
+                    print("予期しない動作です。閾値のチューニングが必要です。")
+                    img.show()
+                    import subprocess
+                    subprocess.run(["open", temp_path])
+                    raise("エラー5591")
+                else:
+                    img.save(temp_path)
+                    print("{}として保存しました。".format(temp_path))
+                    print("再実行してください。")
+                    raise("エラー3349")
             else:
-                img.save(temp_path)
-                print("{}として保存しました。".format(temp_path))
-                print("再実行してください。")
+                print("追加を取りやめます。")
 
     def calc_score(self, x, temp):
         "ベクトルx、yを比較し、スコアを計算し返す。現状では負の二乗誤差"
