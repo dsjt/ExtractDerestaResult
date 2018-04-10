@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # デレステのリザルト画面から、データを抜き出しjsonで返すスクリプト
 from PIL import Image
@@ -14,6 +14,9 @@ import unicodedata
 
 
 def yes_or_no(question):
+    """
+    ユーザーにyes/noを尋ね、結果をTrue/Falseで返す
+    """
     while True:
         choice = input(question).lower()
         if choice in ['y', 'ye', 'yes']:
@@ -34,7 +37,9 @@ class Deresta_recognizer(object):
         pass
 
     def load_num_templates(self):
-        "数字のテンプレートを読み込み、numpy配列として返す"
+        """
+        数字のテンプレートを dat/{数字}.jpg ファイルから読み込み、numpy配列として返す
+        """
         templates = []
         for i in range(10):
             im = Image.open("dat/" + str(i) +
@@ -45,6 +50,9 @@ class Deresta_recognizer(object):
         return templates
 
     def load_title_templates(self):
+        """
+        dat/title/{曲名}.jpg から曲名画像を読み取り、numpy配列として返す。
+        """
         from glob import glob
         templates = []
         for fn in glob("./dat/title/*.jpg"):
@@ -55,16 +63,27 @@ class Deresta_recognizer(object):
         return templates
 
     def add_new_tune_UI(self, img, info):
+        """
+       一致率が低いとき、新規楽曲の画像であると考えられる。
+        新規楽曲のデータをインタラクティブに追加するためのユーザーインターフェースを提供する。
+        1. 入力画像から楽曲名部分を切り取り、表示する
+        2. 楽曲名の一部を入力してもらう
+        3. .tune_info.csv ファイルを検索し、楽曲情報を表示し、認識できる楽曲に追加するかを尋ねる。
+        args:
+            img: 画像
+            info: .tune_info.csvから読み取った楽曲情報
+        return: 未定義
+        """
         img.show()
         print("一致率が低いです。新規譜面ではありませんか？")
         tune_name = input("画像の曲のタイトルの一部を入力")
         if len(info[info['楽曲名'].str.contains(tune_name)]) == 0:
+            img.save("tmp_title.jpg")
             print("曲名を検索しましたが、ありませんでした。" +
                   "tmp_title.jpgとして保存します" +
                   "新しく実装された曲の場合、" +
                   "update_tune_info.pyの実行を検討して下さい。")
-            img.save("tmp_title.jpg")
-            raise("エラー1092")
+            raise ValueError("曲名が見つかりません")
         else:
             tune_info = info[info['楽曲名'].str.contains(tune_name)]
             print(tune_info['楽曲名'])
@@ -87,14 +106,25 @@ class Deresta_recognizer(object):
             else:
                 print("追加を取りやめます。")
 
-    def calc_score(self, x, temp):
-        "ベクトルx、yを比較し、スコアを計算し返す。現状では負の二乗誤差"
+    def calc_score(self, x, y):
+        """
+        numpy配列のx、yを比較し、一致率スコアを計算して返す。
+        現状では負の二乗誤差を一致率スコアとしている。
+        args:
+            x: numpy配列 次元はyと同じであれば不問
+            y: numpy配列 次元はxと同じであれば不問
+        return:
+            小数。一致率のスコアを表す。大きいほど、一致している。
+        """
         regularized_x = (x - np.min(x)) / (np.max(x) - np.min(x))
-        regularized_temp = (temp - np.min(temp)) / \
-            (np.max(temp) - np.min(temp))
-        return -np.sum((regularized_temp - regularized_x)**2)
+        regularized_y = (y - np.min(y)) / (np.max(y) - np.min(y))
+        return -np.sum((regularized_y - regularized_x)**2)
 
     def too_small_score(self, score):
+        """
+        一致率を調べ、小さすぎればTrue, そうでなければFalseを返す。
+        後の修正に備えている。
+        """
         return (score < -500)
 
     def classify_number(self, img):
@@ -116,11 +146,24 @@ class Deresta_recognizer(object):
         return answer
 
     def recognize_num(self, image_list):
-        "画像リストの数字を認識し、ひとつづきの整数と解釈して返す"
+        """
+        画像からなるリストを受け取り、各画像の数字を認識し、ひとつづきの整数と解釈して返す。
+        args:
+            image_list: 要素が画像データからなるリスト
+        return:
+            整数
+        """
         return int("".join([str(self.classify_number(img)) for img in image_list]))
 
     def recognize_title(self, img):
-        "画像を認識し、曲情報の表を返す"
+        """
+        画像を認識し、曲情報の表を返す
+        曲情報は .tune_info.csv からpandasのデータフレームとして取得する。
+        args:
+            img: 画像データ
+        return:
+            pandasのデータフレーム
+        """
         from glob import glob
 
         # テンプレートの読み込み
@@ -150,6 +193,13 @@ class Deresta_recognizer(object):
             return info[info['楽曲名'] == name]
 
     def recognize_difficulty(self, img):
+        """
+        画像データから難易度を認識し、難易度を文字列で返す。
+        args:
+            img: 画像データ
+        return:
+            文字列。難易度を表す。
+        """
         templates = []
         for fn in ["./dat/debut.jpg",
                    "./dat/regular.jpg",
@@ -169,6 +219,15 @@ class Deresta_recognizer(object):
         return answer
 
     def recognize_exists(self, img, exist_fn, notex_fn):
+        """
+        画像の存在を認識する。例えば、フルコンボ表示が存在するかを判定する。
+        args:
+            img: 入力画像から該当部分を切り取った画像データ
+            exist_fn: 存在する場合の画像のファイル名
+            notex_fn: 存在しない場合の画像のファイル名
+        return:
+            真偽値。存在すると判定すればTrue, そうでなければFalse
+        """
         with Image.open(exist_fn) as im:
             exist_val = np.array(im)
         with Image.open(notex_fn) as im:
@@ -181,6 +240,13 @@ class Deresta_recognizer(object):
         return bool(exist_score > notex_score)
 
     def extract(self, fn):
+        """
+        ファイルを認識し、楽曲情報や得点を抽出し、辞書形式で返す。
+        args:
+            fn: リザルト画像のファイル名
+        return:
+            辞書
+        """
         if self.num_templates is None:
             self.load_num_templates()
 
@@ -230,12 +296,16 @@ class Deresta_recognizer(object):
 
 def main(fn):
     # 設定読み込み
-    dr = Deresta_recognizer()
-    data = dr.extract(fn)
-    if data == -1:
-        return -1
-    print(json.dumps(data, indent=4, ensure_ascii=False))
-    return data
+    try:
+        dr = Deresta_recognizer()
+        data = dr.extract(fn)
+        if data == -1:
+            return -1
+        print(json.dumps(data, indent=4, ensure_ascii=False))
+        return data
+    except ValueError as err:
+        print(err)
+
 
 if __name__ == '__main__':
     import argparse
