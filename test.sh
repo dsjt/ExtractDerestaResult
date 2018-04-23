@@ -5,4 +5,4 @@ for f in $TEMP
 do
     ./src/extract_result.py $f
 done
-open $TEMP
+eog $TEMP
