@@ -1,3 +1,6 @@
 tmp
 *.pyc
 /diary.org
+/agenda.org~
+/env/bin/activate
+/env/*
