@@ -88,7 +88,7 @@ class Deresta_recognizer(object):
             print("楽曲情報と一致しました。")
             temp_path = "dat/title/" + tune_info[:1]['テンプレート名'].values[0]
             yesorno = yes_or_no("{}として追加しますか？(y/n)".format(temp_path))
-            if yesorno == True:
+            if yesorno:
                 if os.path.exists(temp_path):
                     print(temp_path + "はすでに存在しています。")
                     print("予期しない動作です。閾値のチューニングが必要です。")
@@ -151,7 +151,8 @@ class Deresta_recognizer(object):
         return:
             整数
         """
-        return int("".join([str(self.classify_number(img)) for img in image_list]))
+        num_list = [str(self.classify_number(img)) for img in image_list]
+        return int("".join(num_list))
 
     def recognize_title(self, img):
         """
@@ -162,8 +163,6 @@ class Deresta_recognizer(object):
         return:
             pandasのデータフレーム
         """
-        from glob import glob
-
         # テンプレートの読み込み
         templates = self.load_title_templates()
 
