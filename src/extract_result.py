@@ -149,7 +149,7 @@ class Deresta_recognizer(object):
             answer = 0
         else:
             answer = int(self.knn.predict(value.reshape(1, -1)))
-            print(self.knn.predict_proba(value.reshape(1, -1)))
+            # print(self.knn.predict_proba(value.reshape(1, -1)))
         return answer
 
     def recognize_num(self, image_list):
@@ -299,6 +299,30 @@ class Deresta_recognizer(object):
                 pass
         return self.data
 
+    def pprint(self):
+        if self.data is None:
+            return None
+        res = []
+        res.append(self.data["title"])
+        res.append(self.data["difficulty"])
+        res.append(str(self.data["level"]))
+        res.append(str(self.data["perfect"]))
+        res.append(str(self.data["great"]))
+        res.append(str(self.data["nice"]))
+        res.append(str(self.data["bad"]))
+        res.append(str(self.data["miss"]))
+        res.append(str(self.data["combo"]))
+        res.append(str(self.data["full_combo"]))
+        res.append(str(self.data["new_record"]))
+        res.append(str(self.data["score"]))
+        res.append(str(self.data["high_score"]))
+        res.append(str(self.data["tune_PRP"]))
+        res.append(str(self.data["PRP"]))
+        res.append(str(self.data["filename"]))
+        # res.append(str(self.data["date"]))
+        print(",".join(res))
+        return res
+
 
 def main(fn):
     # 設定読み込み
@@ -307,7 +331,7 @@ def main(fn):
         data = dr.extract(fn)
         if data == -1:
             return -1
-        print(json.dumps(data, indent=4, ensure_ascii=False))
+        dr.pprint()
         return data
     except ValueError as err:
         print(err)
