@@ -1,12 +1,12 @@
-TOKIMEKIエスカレート,MASTER,28,796,4,0,0,0,800,True,False,654929,733792,73,728,test/test00.jpg,18/05/06 12:29:26:545910
-Hotel Moonside,MASTER,27,777,2,0,0,0,779,True,False,715028,720143,72,728,test/test01.jpg,18/05/06 12:29:27:188582
-あんずのうた,MASTER,28,698,2,0,0,0,700,True,True,737359,737359,73,730,test/test02.jpg,18/05/06 12:29:27:830663
-きみにいっぱい☆,MASTER+,28,774,6,0,0,0,780,True,True,817733,817733,0,730,test/test03.jpg,18/05/06 12:29:28:494574
-Treasure☆,MASTER,24,538,1,0,0,2,358,False,False,610388,0,0,1003,test/test04.jpg,18/05/06 12:29:29:142595
-き・ま・ぐ・れ☆Café au lait！,MASTER,25,534,2,0,0,1,313,False,False,625236,0,0,1003,test/test05.jpg,18/05/06 12:29:29:788547
-Romantic Now,MASTER,27,654,2,0,0,4,412,False,False,549112,0,0,1003,test/test06.jpg,18/05/06 12:29:30:487949
-ミラクルテレパシー,MASTER,26,689,2,0,0,4,480,False,False,544950,0,0,1003,test/test07.jpg,18/05/06 12:29:31:153895
-ハイファイ☆デイズ,MASTER,24,553,1,0,0,0,554,True,False,747976,0,0,1003,test/test08.jpg,18/05/06 12:29:31:803942
-Treasure☆,MASTER,24,541,0,0,0,0,541,True,False,735239,0,0,1003,test/test09.jpg,18/05/06 12:29:32:466349
-Radio Happy,MASTER,27,734,5,0,0,0,739,True,False,1077682,1077682,107,1289,test/test10.png,18/05/06 12:29:33:130125
-美に入り彩を穿つ,MASTER,27,818,6,2,0,4,376,False,False,975039,1163697,118,1312,test/test11.png,18/05/06 12:29:33:790618
+TOKIMEKIエスカレート,MASTER,28,796,4,0,0,0,800,True,False,654929,733792,73,728,test/test00.jpg
+Hotel Moonside,MASTER,27,777,2,0,0,0,779,True,False,715028,720143,72,728,test/test01.jpg
+あんずのうた,MASTER,28,698,2,0,0,0,700,True,True,737359,737359,73,730,test/test02.jpg
+きみにいっぱい☆,MASTER+,28,774,6,0,0,0,780,True,True,817733,817733,0,730,test/test03.jpg
+Treasure☆,MASTER,24,538,1,0,0,2,358,False,False,610388,0,0,1003,test/test04.jpg
+き・ま・ぐ・れ☆Café au lait！,MASTER,25,534,2,0,0,1,313,False,False,625236,0,0,1003,test/test05.jpg
+Romantic Now,MASTER,27,654,2,0,0,4,412,False,False,549112,0,0,1003,test/test06.jpg
+ミラクルテレパシー,MASTER,26,689,2,0,0,4,480,False,False,544950,0,0,1003,test/test07.jpg
+ハイファイ☆デイズ,MASTER,24,553,1,0,0,0,554,True,False,747976,0,0,1003,test/test08.jpg
+Treasure☆,MASTER,24,541,0,0,0,0,541,True,False,735239,0,0,1003,test/test09.jpg
+Radio Happy,MASTER,27,734,5,0,0,0,739,True,False,1077682,1077682,107,1289,test/test10.png
+美に入り彩を穿つ,MASTER,27,818,6,2,0,4,376,False,False,975039,1163697,118,1312,test/test11.png
