@@ -5,9 +5,7 @@ from PIL import Image
 from PIL import ImageOps
 import json
 import numpy as np
-import sys
 import os
-import pandas as pd
 from datetime import datetime
 from update_tune_info import tune_info
 import unicodedata
