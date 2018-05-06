@@ -4,3 +4,7 @@ tmp
 /agenda.org~
 /env/bin/activate
 /env/*
+
+test/tmp\.txt
+
+tmp_title\.jpg
