@@ -1,5 +1,8 @@
 # TIME=`date +%Y-%m-%d_%H-%M-%S`
 files=`ls test/test*.jpg test/test*.png`
+if [ -e extract.log ]; then
+    rm extract.log
+fi
 if [ -e test/tmp.txt ]; then
     rm test/tmp.txt
 fi

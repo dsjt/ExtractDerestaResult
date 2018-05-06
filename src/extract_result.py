@@ -10,6 +10,17 @@ from datetime import datetime
 from update_tune_info import tune_info
 import unicodedata
 from sklearn.neighbors import KNeighborsClassifier
+from functools import reduce
+
+from logging import getLogger, FileHandler, DEBUG
+logger = getLogger(__name__)
+handler = FileHandler(filename='extract.log', mode="a")
+handler.setLevel(DEBUG)
+logger.setLevel(DEBUG)
+logger.addHandler(handler)
+logger.propagate = False
+
+logger.debug(datetime.now().strftime("[%y/%m/%d %H:%M:%S]"))
 
 
 def yes_or_no(question):
@@ -149,7 +160,15 @@ class Deresta_recognizer(object):
             answer = 0
         else:
             answer = int(self.knn.predict(value.reshape(1, -1)))
-            # print(self.knn.predict_proba(value.reshape(1, -1)))
+            proba = self.knn.predict_proba(value.reshape(1, -1))
+            proba_dic = {(i, f) for i, f in enumerate(list(proba.ravel()))}
+            res = str(max(proba_dic, key=lambda x: x[1]))
+            res += " ..."
+            logger.debug(res+reduce(lambda x, y: str(x)+", "+str(y),
+                                    list(proba.ravel())))
+            # str(proba.argmax()) + " ... " +
+            # ",".join(map(str, list(proba[proba > 0].argsort()))))
+            # logger.debug(sorted(proba_dic, key=lambda x: x[1], reverse=True))
         return answer
 
     def recognize_num(self, image_list):
@@ -326,6 +345,7 @@ class Deresta_recognizer(object):
 
 def main(fn):
     # 設定読み込み
+    logger.debug(fn)
     try:
         dr = Deresta_recognizer()
         data = dr.extract(fn)
@@ -347,3 +367,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.filename)
+
+handler.close()
