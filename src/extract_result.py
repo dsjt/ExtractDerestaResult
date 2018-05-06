@@ -149,7 +149,7 @@ class Deresta_recognizer(object):
             answer = 0
         else:
             answer = int(self.knn.predict(value.reshape(1, -1)))
-            print(self.knn.predict_proba(value.reshape(1, -1)))
+            # print(self.knn.predict_proba(value.reshape(1, -1)))
         return answer
 
     def recognize_num(self, image_list):
@@ -319,7 +319,7 @@ class Deresta_recognizer(object):
         res.append(str(self.data["tune_PRP"]))
         res.append(str(self.data["PRP"]))
         res.append(str(self.data["filename"]))
-        res.append(str(self.data["date"]))
+        # res.append(str(self.data["date"]))
         print(",".join(res))
         return res
 
