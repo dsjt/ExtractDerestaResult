@@ -9,6 +9,7 @@ import os
 from datetime import datetime
 from update_tune_info import tune_info
 import unicodedata
+from sklearn.neighbors import KNeighborsClassifier
 
 
 def yes_or_no(question):
@@ -32,6 +33,15 @@ class Deresta_recognizer(object):
         self.num_templates = None
         self.title_templates = None
         self.difficulty_templates = None
+
+        # 数字の認識をKNNで行う。セットアップ
+        knn = KNeighborsClassifier(n_neighbors=1)
+        X = self.load_num_templates()
+        X_vectorized = np.asarray([x.ravel() for x in X])
+        y = range(10)
+        knn.fit(X_vectorized, y)
+        self.knn = knn
+
         pass
 
     def load_num_templates(self):
@@ -138,9 +148,8 @@ class Deresta_recognizer(object):
         if np.std(value) < 20:  # 数字らしきものが見えん場合
             answer = 0
         else:
-            score = [self.calc_score(value, temp)
-                     for temp in self.num_templates]
-            answer = np.argmax(score)
+            answer = int(self.knn.predict(value.reshape(1, -1)))
+            print(self.knn.predict_proba(value.reshape(1, -1)))
         return answer
 
     def recognize_num(self, image_list):
