@@ -38,7 +38,8 @@ https://ja.wikipedia.org/wiki/MIT_License
 切り出しのずれ以外は、考慮する必要がないか？
 *** DONE scikit-learnよりKNNを採用し利用可能に
 CLOSED: [2018-05-06 日 12:00]
-** TODO テストの整理
+** DONE テストの整理
+CLOSED: [2018-05-06 日 12:51]
 - 出力をCSVへ
 - テストデータの正解を作る
 - テスト可能に
