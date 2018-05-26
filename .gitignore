@@ -1,7 +1,7 @@
 tmp
 *.pyc
 /diary.org
-/agenda.org~
+*.*~
 /env/bin/activate
 /env/*
 
@@ -10,3 +10,5 @@ test/tmp\.txt
 tmp_title\.jpg
 
 extract\.log
+
+tmpdata/*
