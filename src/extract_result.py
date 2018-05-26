@@ -161,7 +161,6 @@ class Deresta_recognizer(object):
         return(int)
           識別された数字
         """
-        # gray = img.getchannel(2)
         # てかり対策に青だけ見る
         gray = Image.fromarray(np.asarray(img)[:, :, 2])
         # gray = ImageOps.grayscale(img)
