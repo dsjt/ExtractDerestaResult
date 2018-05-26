@@ -10,3 +10,5 @@ test/tmp\.txt
 tmp_title\.jpg
 
 extract\.log
+
+*.log
