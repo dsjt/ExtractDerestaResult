@@ -11,27 +11,10 @@ python3 extract_result.py スクショファイル名orパス
 * 例
 #+attr_html: :width "100px"
 #+ATTR_ORG: :width 100
-[[file:test/test04.jpg]]
+[[file:test/test01.jpg]]
 の画像を与えた時、以下を出力する。
 #+BEGIN_EXAMPLE
-{
-    "date": "17/06/07 17:57:35:062447",
-    "title": "Treasure☆",
-    "difficulty": "MASTER",
-    "level": 24,
-    "perfect": 538,
-    "great": 1,
-    "nice": 0,
-    "bad": 0,
-    "miss": 2,
-    "combo": 358,
-    "full_combo": true,
-    "new_record": true,
-    "score": 610388,
-    "high_score": 0,
-    "tune_PRP": 0,
-    "PRP": 1003
-}
+Hotel Moonside,MASTER,27,777,2,0,0,0,779,True,False,715028,720143,72,728,test/test01.jpg
 #+END_EXAMPLE
 * 働いたら負け （課題）
 - 数字の認識方法いくつか試して遊ぶ
