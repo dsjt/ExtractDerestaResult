@@ -9,4 +9,4 @@ Romantic Now,MASTER,27,654,2,0,0,4,412,False,False,549112,0,0,1003,test/test06.j
 ハイファイ☆デイズ,MASTER,24,553,1,0,0,0,554,True,False,747976,0,0,1003,test/test08.jpg
 Treasure☆,MASTER,24,541,0,0,0,0,541,True,False,735239,0,0,1003,test/test09.jpg
 Radio Happy,MASTER,27,734,5,0,0,0,739,True,False,1077682,1077682,107,1289,test/test10.png
-美に入り彩を穿つ,MASTER,27,818,6,2,0,4,376,False,False,975039,1163697,118,1312,test/test11.png
+美に入り彩を穿つ,MASTER,27,818,6,2,0,4,376,False,False,975039,1163697,116,1312,test/test11.png
