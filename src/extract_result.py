@@ -46,11 +46,17 @@ class Deresta_recognizer(object):
         self.difficulty_templates = None
 
         # 数字の認識をKNNで行う。セットアップ
-        knn = KNeighborsClassifier(n_neighbors=1)
-        X = self.load_num_templates()
-        X_vectorized = np.asarray([x.ravel() for x in X])
-        y = range(10)
-        knn.fit(X_vectorized, y)
+        knn = KNeighborsClassifier(n_neighbors=3)
+        import glob
+        X = []
+        y = []
+        for i in range(10):
+            for fn in glob.glob("./tmpdata/{label}/*".format(label=i)):
+                im = Image.open(fn).resize(self.regularized_size)
+                gray = ImageOps.grayscale(im)
+                X.append(np.asarray(gray).ravel().astype(np.float))
+                y.append(i)
+        knn.fit(np.asarray(X), np.asarray(y))
         self.knn = knn
 
         pass
@@ -78,7 +84,8 @@ class Deresta_recognizer(object):
             im = Image.open(fn)
             temp = np.asarray(im)
             templates += [[os.path.basename(fn), temp]]
-        templates = dict(sorted(templates, key=lambda x: x[0]))
+        templates = dict(templates)
+        # templates = dict(sorted(templates, key=lambda x: x[0]))
         return templates
 
     def add_new_tune_UI(self, img, info):
@@ -144,7 +151,7 @@ class Deresta_recognizer(object):
         一致率を調べ、小さすぎればTrue, そうでなければFalseを返す。
         後の修正に備えている。
         """
-        return (score < -500)
+        return (score < -700)
 
     def classify_number(self, img):
         """
@@ -154,13 +161,16 @@ class Deresta_recognizer(object):
         return(int)
           識別された数字
         """
-        gray = ImageOps.grayscale(img)
+        # gray = img.getchannel(2)
+        # てかり対策に青だけ見る
+        gray = Image.fromarray(np.asarray(img)[:, :, 2])
+        # gray = ImageOps.grayscale(img)
         value = np.array(gray.resize(self.regularized_size))
         if np.std(value) < 20:  # 数字らしきものが見えん場合
             answer = 0
         else:
-            answer = int(self.knn.predict(value.reshape(1, -1)))
-            proba = self.knn.predict_proba(value.reshape(1, -1))
+            answer = int(self.knn.predict(value.reshape(1, -1).astype(np.float)))
+            proba = self.knn.predict_proba(value.reshape(1, -1).astype(np.float))
             proba_dic = {(i, f) for i, f in enumerate(list(proba.ravel()))}
             res = str(max(proba_dic, key=lambda x: x[1]))
             res += " ..."
@@ -180,6 +190,11 @@ class Deresta_recognizer(object):
             整数
         """
         num_list = [str(self.classify_number(img)) for img in image_list]
+        # import uuid
+        # for i, img in enumerate(image_list):
+        #     img.save("test/{num_dir}/{file_uuid}.jpg".format(num_dir=num_list[i],
+        #                                                      file_uuid=uuid.uuid4()))
+
         return int("".join(num_list))
 
     def recognize_title(self, img):
@@ -206,6 +221,7 @@ class Deresta_recognizer(object):
 
         # 一致率が低する場合、テンプレート情報として追加する
         if self.too_small_score(answer[1]):
+            logger.debug("too_small_score answer=\"{}\":{}".format(answer[0], answer[1]))
             self.add_new_tune_UI(img, info)
             return -1
 
@@ -310,6 +326,7 @@ class Deresta_recognizer(object):
                     images += [im]
                 self.data[item] = self.recognize_num(images)
             elif isinstance(self.config[item], list):
+                logger.debug("tmp/{}.jpg".format(item))
                 im = self.result.crop(self.config[item])
                 im.save("tmp/{}.jpg".format(item))
                 self.data[item] = None
