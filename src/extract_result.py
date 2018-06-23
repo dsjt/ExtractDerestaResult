@@ -11,6 +11,7 @@ from update_tune_info import tune_info
 import unicodedata
 from sklearn.neighbors import KNeighborsClassifier
 from functools import reduce
+import glob
 
 from logging import getLogger, FileHandler, DEBUG
 logger = getLogger(__name__)
@@ -36,20 +37,18 @@ def yes_or_no(question):
 
 
 class Deresta_recognizer(object):
+    regularized_size = (18, 26)
 
     def __init__(self, config_fn=".crop_box.json"):
         with open(config_fn, "r") as f:
             self.config = json.load(f)
-        self.regularized_size = (18, 26)
         self.num_templates = None
         self.title_templates = None
         self.difficulty_templates = None
 
         # 数字の認識をKNNで行う。セットアップ
         knn = KNeighborsClassifier(n_neighbors=3)
-        import glob
-        X = []
-        y = []
+        X, y = [], []
         for i in range(10):
             for fn in glob.glob("./tmpdata/{label}/*".format(label=i)):
                 im = Image.open(fn).resize(self.regularized_size)
@@ -59,18 +58,15 @@ class Deresta_recognizer(object):
         knn.fit(np.asarray(X), np.asarray(y))
         self.knn = knn
 
-        pass
-
     def load_num_templates(self):
         """
         数字のテンプレートを dat/{数字}.jpg ファイルから読み込み、numpy配列として返す
         """
         templates = []
         for i in range(10):
-            im = Image.open("dat/" + str(i) +
-                            ".jpg").resize(self.regularized_size)
-            temp = np.asarray(im)
-            templates += [temp]
+            fn = "dat/" + str(i) + ".jpg"
+            im = Image.open(fn).resize(self.regularized_size)
+            templates += [np.asarray(im)]
         self.num_templates = templates
         return templates
 
@@ -161,15 +157,14 @@ class Deresta_recognizer(object):
         return(int)
           識別された数字
         """
-        # てかり対策に青だけ見る
+        # てかり対策に青だけを見る
         gray = Image.fromarray(np.asarray(img)[:, :, 2])
-        # gray = ImageOps.grayscale(img)
         value = np.array(gray.resize(self.regularized_size))
-        if np.std(value) < 20:  # 数字らしきものが見えん場合
+        if np.std(value) < 20:  # 数字らしきものが見えない場合
             answer = 0
         else:
-            answer = int(self.knn.predict(value.reshape(1, -1).astype(np.float)))
             proba = self.knn.predict_proba(value.reshape(1, -1).astype(np.float))
+            answer = np.argmax(proba)
             proba_dic = {(i, f) for i, f in enumerate(list(proba.ravel()))}
             res = str(max(proba_dic, key=lambda x: x[1]))
             res += " ..."
@@ -339,8 +334,9 @@ class Deresta_recognizer(object):
             return None
         key_order = ["title", "difficulty", "level", "perfect", "great", "nice",
                      "bad", "miss", "combo", "full_combo", "new_record", "score",
-                     "high_score", "tune_PRP", "PRP", "filename", "date"]
-        print("\t".join(key_order))
+                     "high_score", "tune_PRP", "PRP", "filename"  # , "date"
+                     ]
+        # print("\t".join(key_order))
         res = [str(self.data[key]) for key in key_order]
         print("\t".join(res))
         return res
