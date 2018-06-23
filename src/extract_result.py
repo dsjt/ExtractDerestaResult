@@ -337,25 +337,12 @@ class Deresta_recognizer(object):
     def pprint(self):
         if self.data is None:
             return None
-        res = []
-        res.append(self.data["title"])
-        res.append(self.data["difficulty"])
-        res.append(str(self.data["level"]))
-        res.append(str(self.data["perfect"]))
-        res.append(str(self.data["great"]))
-        res.append(str(self.data["nice"]))
-        res.append(str(self.data["bad"]))
-        res.append(str(self.data["miss"]))
-        res.append(str(self.data["combo"]))
-        res.append(str(self.data["full_combo"]))
-        res.append(str(self.data["new_record"]))
-        res.append(str(self.data["score"]))
-        res.append(str(self.data["high_score"]))
-        res.append(str(self.data["tune_PRP"]))
-        res.append(str(self.data["PRP"]))
-        res.append(str(self.data["filename"]))
-        # res.append(str(self.data["date"]))
-        print(",".join(res))
+        key_order = ["title", "difficulty", "level", "perfect", "great", "nice",
+                     "bad", "miss", "combo", "full_combo", "new_record", "score",
+                     "high_score", "tune_PRP", "PRP", "filename", "date"]
+        print("\t".join(key_order))
+        res = [str(self.data[key]) for key in key_order]
+        print("\t".join(res))
         return res
 
 
